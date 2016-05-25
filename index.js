@@ -1,3 +1,5 @@
+#! /usr/bin/env node
+
 var fs = require('fs')
 var deployConfig = require('./deploy.json')
 var Task = require('shell-task')
