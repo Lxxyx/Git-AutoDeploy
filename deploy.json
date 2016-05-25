@@ -1,0 +1,5 @@
+{
+  "name": "deployTest",
+  "port": 8000,
+  "task": ["rm -rf .git", "git init", "git add *", "git status"]
+}
