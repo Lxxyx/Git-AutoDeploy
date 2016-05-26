@@ -15,9 +15,12 @@ router
 .get('/', function *(next) {
   this.body = 'Hello Koa'
 })
-.get('/deployTest', function *(next) {
-  this.body = 'This is deployTest'
-  new Task('git add *').then('git commit -m "auto deploy"').then('git push -u origin master')
+.get('/wecash', function *(next) {
+  this.body = 'This is wecash'
+  process.chdir('/home/lxxyx/Desktop/wecash')
+  new Task('pm2 stop run.js')
+  .then('git pull')
+  .then('pm2 start run.js')
   .run((err, next) => {
     if (err) {
       console.log(err)
@@ -28,4 +31,4 @@ router
 
 app.use(router.routes())
 
-app.listen(8000)
+app.listen(12315)

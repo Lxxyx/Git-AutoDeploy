@@ -1,12 +1,15 @@
 #! /usr/bin/env node
 
 var fs = require('fs')
-var deployConfig = require('./deploy.json')
+var cwd = process.cwd()
+var modulePath = process.execPath.replace('bin/node', 'lib/node_modules/deploy/')
+var config = require(`${cwd}/hook.json`)
 var Task = require('shell-task')
-var tasks = `new Task('${deployConfig.task[0]}')`
+var tasks = `new Task('${config.task[0]}')`
 
-for (var i = 1, length = deployConfig.task.length; i < length; i++) {
-  tasks += `.then('${deployConfig.task[i]}')`
+for (var i = 1, length = config.task.length; i < length; i++) {
+  tasks += `
+  .then('${config.task[i]}')`
 }
 
 var app = `var Koa = require('koa')
@@ -26,8 +29,9 @@ router
 .get('/', function *(next) {
   this.body = 'Hello Koa'
 })
-.get('/${deployConfig.name}', function *(next) {
-  this.body = 'This is ${deployConfig.name}'
+.get('/${config.name}', function *(next) {
+  this.body = 'This is ${config.name}'
+  process.chdir('${cwd}')
   ${tasks}
   .run((err, next) => {
     if (err) {
@@ -39,18 +43,17 @@ router
 
 app.use(router.routes())
 
-app.listen(${deployConfig.port})
+app.listen(${config.port})
 `
 
-fs.writeFileSync(`${deployConfig.name}.js`, app)
+fs.writeFileSync(`${modulePath}${config.name}.js`, app)
 
-console.log(`Genenate ${deployConfig.name}.js Done!`)
-console.log(`${deployConfig.name} is running on port ${deployConfig.port}`)
-new Task(`node ${deployConfig.name}.js`)
+console.log(`Genenate ${config.name}.js at ${modulePath}`)
+new Task(`forever start ${modulePath}${config.name}.js`)
 .run(err => {
   if (err) {
     console.log(err)
   } else {
-    console.log('Start Run')
+    console.log(`${config.name} is running on port ${config.port}`)
   }
 })
