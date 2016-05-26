@@ -49,7 +49,7 @@ app.listen(${config.port})
 fs.writeFileSync(`${modulePath}${config.name}.js`, app)
 
 console.log(`Genenate ${config.name}.js at ${modulePath}`)
-new Task(`forever start ${modulePath}${config.name}.js`)
+new Task(`forever start --uid "${config.name}" -a ${modulePath}${config.name}.js`)
 .run(err => {
   if (err) {
     console.log(err)
