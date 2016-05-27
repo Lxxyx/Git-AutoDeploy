@@ -1,25 +1,9 @@
 #! /usr/bin/env node
+var program = require('commander')
 
-var fs = require('fs')
-var Task = require('shell-task')
-var cwd = process.cwd()
-var serverDir = process.execPath.replace('bin/node', 'lib/node_modules/deploy/server/')
-var config = require(`${cwd}/hook.json`)
-var generateApp = require('./generateApp.js')
-
-var app = generateApp(config)
-
-var server = `${serverDir}${config.name}.js`
-fs.writeFileSync(server , app)
-console.log(`Genenate ${server}`)
-
-new Task(`forever start --uid "${config.name}" -a 
-  -l ${cwd}/${config.name}.log 
-  ${server}`)
-.run(err => {
-  if (err) {
-    console.log(err)
-  } else {
-    console.log(`${config.name} is running on port ${config.port}`)
-  }
-})
+program
+  .version('1.00')
+  .usage('<command> [options]')
+  .command('start', 'generate & start a hook server by hook.json')
+  .command('stop [name|hook.json.name]', 'stop hook server by given name or current dir hook.json name')
+  .parse(process.argv)
