@@ -1,57 +1,21 @@
 #! /usr/bin/env node
 
 var fs = require('fs')
+var Task = require('shell-task')
 var cwd = process.cwd()
-var modulePath = process.execPath.replace('bin/node', 'lib/node_modules/deploy/')
+var serverDir = process.execPath.replace('bin/node', 'lib/node_modules/deploy/server/')
 var config = require(`${cwd}/hook.json`)
-var Task = require('shell-task')
-var tasks = `new Task('${config.task[0]}')`
+var generateApp = require('./generateApp.js')
 
-for (var i = 1, length = config.task.length; i < length; i++) {
-  tasks += `
-  .then('${config.task[i]}')`
-}
+var app = generateApp(config)
 
-var app = `var Koa = require('koa')
-var Router = require('koa-router')
-var body = require('koa-bodyparser')
-var logger = require('koa-logger')
-var Task = require('shell-task')
+var server = `${serverDir}${config.name}.js`
+fs.writeFileSync(server , app)
+console.log(`Genenate ${server}`)
 
-const app = new Koa()
-
-app.use(body())
-app.use(logger())
-
-const router = new Router()
-
-router
-.get('/', function *(next) {
-  this.body = 'Hello Koa'
-})
-.get('/${config.name}', function *(next) {
-  this.body = 'This is ${config.name}'
-  process.chdir('${cwd}')
-  ${tasks}
-  .run((err, next) => {
-    if (err) {
-      console.log(err)
-    }
-  })
-  
-})
-
-app.use(router.routes())
-
-app.listen(${config.port})
-`
-
-fs.writeFileSync(`${modulePath}${config.name}.js`, app)
-
-console.log(`Genenate ${config.name}.js at ${modulePath}`)
 new Task(`forever start --uid "${config.name}" -a 
-  -l ${cwd}/hook-${config.name}.log 
-  ${modulePath}${config.name}.js`)
+  -l ${cwd}/${config.name}.log 
+  ${server}`)
 .run(err => {
   if (err) {
     console.log(err)
