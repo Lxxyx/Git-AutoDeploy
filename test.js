@@ -3,6 +3,7 @@ var Router = require('koa-router')
 var body = require('koa-bodyparser')
 var logger = require('koa-logger')
 var Task = require('./task.js')
+var forever = require('forever')
 
 var getLog = function () {
   return new Promise(function(reslove, reject) {
@@ -29,12 +30,10 @@ router
     this.body = 'Hello Koa'
   })
   .get('/koa2-easy', function*(next) {
-    var ctx = this
     process.chdir('/home/lxxyx/Desktop/koa2-easy')
     var log = yield getLog()
-    ctx.body = log
+    this.body = log
   })
-
 
 app.use(router.routes())
 

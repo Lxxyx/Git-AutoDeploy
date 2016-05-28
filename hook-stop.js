@@ -2,6 +2,7 @@
 
 var fs = require('fs')
 var Task = require('shell-task-log')
+var forever = require('forever')
 var cwd = process.cwd()
 
 var name = process.argv[2]
@@ -16,12 +17,10 @@ if (name) {
 }
 
 function stopServer(name) {
-  new Task(`forever stop ${name}`)
-    .run(err => {
-      if (err) {
-        throw new Error(err)
-      } else {
-        console.log(`${name} is stop!`)
-      }
-    })
+  try {
+    forever.stop(name)
+  } catch (err) {
+    throw new Error(err)
+  }
+  console.log(`${name} is stoped`)
 }

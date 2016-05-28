@@ -9,7 +9,7 @@
  */
 
 var spawn = require('child_process').spawn
-
+var forever = require('forever')
 /**
  * Task constructor.
  *
@@ -75,12 +75,46 @@ function run (task) {
       return setTimeout(next, +step.args[0])
     }
     var child = spawn(step.cmd, step.args, task.opts)
-    child.stdout.on('data', data => {
-      task.logs.push({
-        cmd: `${step.cmd} ${step.args.join(' ')}`,
-        log: data.toString()
+
+    var fullcmd = `${step.cmd} ${step.args.join(' ')}`
+    // handle forever list requests
+    if (fullcmd === 'forever list') {
+      foreverList().then(data => {
+        if (!data) {
+          task.logs.push({
+            cmd: fullcmd,
+            log: 'no forever apps'
+          })
+          return true
+        }
+        var list = []
+        data.forEach(val => {
+          list.push({
+            uid: val.uid,
+            running: val.running,
+            restarts: val.restarts,
+            ctime: new Date(val.ctime),
+            cwd: `${val.cwd}/${val.file}`
+          })
+        })
+        task.logs.push({
+          cmd: fullcmd,
+          log: list
+        })
       })
-    })
+    } else {
+      var outlog = ''
+      child.stdout.on('data', data => {
+        outlog += data.toString()
+      })
+      child.stdout.on('close', () => {
+        task.logs.push({
+          cmd: fullcmd,
+          log: outlog
+        })
+      })
+    }
+
     child.once('error', handle)
     child.once('exit', next)
   }
@@ -173,6 +207,18 @@ function defaultCb (err) {
   } else {
     log('Task completed.', 32)
   }
+}
+
+function foreverList () {
+  return new Promise(function(reslove, reject){
+    forever.list(false, (err, list) => {
+      if (err) {
+        reject(err)
+      } else {
+        reslove(list)
+      }
+    })
+  })
 }
 
 /**
