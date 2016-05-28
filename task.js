@@ -24,7 +24,7 @@ function Task (cmd, opts) {
     stdio: 'pipe'
   }
   this.queue = []
-  this.log = ''
+  this.logs = []
   this.then(cmd)
 }
 
@@ -76,7 +76,10 @@ function run (task) {
     }
     var child = spawn(step.cmd, step.args, task.opts)
     child.stdout.on('data', data => {
-      task.log += data.toString()
+      task.logs.push({
+        cmd: `${step.cmd} ${step.args.join(' ')}`,
+        log: data.toString()
+      })
     })
     child.once('error', handle)
     child.once('exit', next)
@@ -94,8 +97,9 @@ function run (task) {
       if (task.queue.length) {
         run(task)
       } else {
-        console.log(task.log)
-        task.cb(null, task.log)
+        setTimeout(() => {
+          task.cb(null, task.logs)
+        }, 10)
       }
     }
   }

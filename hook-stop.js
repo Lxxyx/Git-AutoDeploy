@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 
 var fs = require('fs')
-var Task = require('shell-task')
+var Task = require('shell-task-log')
 var cwd = process.cwd()
 
 var name = process.argv[2]

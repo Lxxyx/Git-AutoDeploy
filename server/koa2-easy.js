@@ -3,8 +3,21 @@
   var Router = require('koa-router')
   var body = require('koa-bodyparser')
   var logger = require('koa-logger')
-  var Task = require('shell-task')
+  var Task = require('shell-task-log')
 
+  var getLog = function () {
+    return new Promise(function(reslove, reject) {
+      new Task('ls')
+    .then('forever list')
+      .run((err, log) => {
+        if (err) {
+          reject(err)
+        }
+        reslove(log)
+      })
+    })
+  }
+  
   const app = new Koa()
 
   app.use(body())
@@ -17,15 +30,9 @@
     this.body = 'Hello Koa'
   })
   .get('/koa2-easy', function *(next) {
-    this.body = 'This is koa2-easy'
     process.chdir('/home/lxxyx/Desktop/koa2-easy')
-    new Task('ls')
-    .run((err, next) => {
-      if (err) {
-        console.log(err)
-      }
-    })
-    
+    var log = yield getLog()
+    this.body = log
   })
 
   app.use(router.routes())

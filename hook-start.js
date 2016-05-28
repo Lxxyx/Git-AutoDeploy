@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 
 var fs = require('fs')
-var Task = require('shell-task')
+var Task = require('shell-task-log')
 var generateApp = require('./generateApp.js')
 var serverDir = process.execPath.replace('bin/node', 'lib/node_modules/deploy/server/')
 var cwd = process.cwd()

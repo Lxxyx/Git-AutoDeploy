@@ -10,8 +10,20 @@ function generateApp(config) {
   var Router = require('koa-router')
   var body = require('koa-bodyparser')
   var logger = require('koa-logger')
-  var Task = require('shell-task')
+  var Task = require('shell-task-log')
 
+  var getLog = function () {
+    return new Promise(function(reslove, reject) {
+      ${tasks}
+      .run((err, log) => {
+        if (err) {
+          reject(err)
+        }
+        reslove(log)
+      })
+    })
+  }
+  
   const app = new Koa()
 
   app.use(body())
@@ -24,15 +36,9 @@ function generateApp(config) {
     this.body = 'Hello Koa'
   })
   .get('/${config.name}', function *(next) {
-    this.body = 'This is ${config.name}'
     process.chdir('${process.cwd()}')
-    ${tasks}
-    .run((err, next) => {
-      if (err) {
-        console.log(err)
-      }
-    })
-    
+    var log = yield getLog()
+    this.body = log
   })
 
   app.use(router.routes())
