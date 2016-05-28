@@ -7,8 +7,8 @@
 
   var getLog = function () {
     return new Promise(function(reslove, reject) {
-      new Task('ls')
-    .then('forever list')
+      new Task('git pull')
+    .then('pm2 reload run.js')
       .run((err, log) => {
         if (err) {
           reject(err)

@@ -13,7 +13,7 @@ if (name) {
   var name = require(`${cwd}/hook.json`).name
   stopServer(name)
 } else {
-  throw new Err('You must provide a name to stop the server')
+  throw new Error('You must provide a name to stop the server')
 }
 
 function stopServer(name) {
