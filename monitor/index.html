@@ -62,13 +62,13 @@
       cursor: pointer;
       transition: 0.3s linear;
     }
-    #execute {
+    .btn-success {
       background: #4CAF50;
     }
-    #look {
+    .btn-default {
       background: #42BBF2;
     }
-    #stop {
+    .btn-danger {
       background: #F44336;
     }
     .running,.stopped {
@@ -98,15 +98,6 @@
         <th>创建时间</th>
         <th>操作</th>
       </tr>
-<!--       <tr align="center" class="tabel-info">
-        <td>Koa2-Easy</td>
-        <td>True</td>
-        <td>1</td>
-        <td>
-          <button id="execute">执行指令</button>
-          <button id="stop">关闭hook</button>
-        </td>
-      </tr> -->
       <tr align="center" class="process-list" v-for="ele in list">
         <td>{{ele.uid}}</td>
         <td>
@@ -114,10 +105,14 @@
         </td>
         <td>{{ele.restarts}}</td>
         <td>{{ele.ctime | time}}</td>
-        <td class="buttons">
-          <button id="execute" @click="execute(ele.uid)">执行hook</button>
-          <button id="look">查看hook</button>
-          <button id="stop">关闭hook</button>
+        <td class="buttons" v-if="ele.running">
+          <button class="btn-success" @click="execute(ele.uid)">执行hook</button>
+          <button class="btn-default">查看hook</button>
+          <button class="btn-danger">关闭hook</button>
+        </td>
+        <td class="buttons" v-else>
+          <button class="btn-success">重启hook</button>
+          <button class="btn-default">查看log</button>
         </td>
       </tr>
     </table>
