@@ -23,4 +23,5 @@ function stopServer(name) {
     throw new Error(err)
   }
   console.log(`${name} is stoped`)
+  return `${name} is stoped`
 }
