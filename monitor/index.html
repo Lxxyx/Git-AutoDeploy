@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <title>Hook Monitor</title>
   <link rel="stylesheet" type="text/css" href="http://cdn.bootcss.com/normalize/4.1.1/normalize.min.css">
   <script src="http://cdn.bootcss.com/vue/1.0.24/vue.js"></script>
@@ -36,8 +37,56 @@
     .tabel {
       width: 100%;
     }
-    .tabel-header {
-      border-bottom: 1px solid #cccccc;
+    .process-list {
+      height: 50px;
+    }
+    .buttons {
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .buttons button {
+      flex: 1;
+      outline: none;
+      border: none;
+      display: inline-block;
+      margin-left: 4px;
+      margin-bottom: 1px;
+      font-size: 13px;
+      color: #3e3e3e;
+      border-radius: 4px;
+      padding: 5px 0;
+      color: #fff;
+      cursor: pointer;
+      transition: 0.3s linear;
+    }
+    #execute {
+      background: #4CAF50;
+    }
+    #look {
+      background: #42BBF2;
+    }
+    #look:hover {
+      background: #64C7F5;
+    }
+    #stop {
+      background: #F44336;
+    }
+    #stop:hover {
+      background: #FF6B60;
+    }
+    .running,.stop {
+      display: inline-block;
+      width: 0;
+      height: 0;
+      padding: 6px 20px;
+    }
+    .running {
+      background: #4CAF50;
+    }
+    .stop {
+      background: #F44336;
     }
   </style>
 </head>
@@ -49,20 +98,56 @@
     <table class="tabel">
       <tr class="tabel-header">
         <th>名称</th>
-        <th>正在运行</th>
-        <th>启动</th>
-        <th>关闭</th>
+        <th>运行状态</th>
+        <th>重启次数</th>
+        <th>创建时间</th>
+        <th>操作</th>
       </tr>
-      <tr align="center">
+<!--       <tr align="center" class="tabel-info">
         <td>Koa2-Easy</td>
         <td>True</td>
-        <td>hahaha</td>
-        <td>123123</td>
+        <td>1</td>
+        <td>
+          <button id="execute">执行指令</button>
+          <button id="stop">关闭hook</button>
+        </td>
+      </tr> -->
+      <tr align="center" class="process-list" v-for="ele in list">
+        <td>{{ele.uid}}</td>
+        <td><span class="running"></span></td>
+        <td>{{ele.restarts}}</td>
+        <td>{{ele.ctime | time}}</td>
+        <td class="buttons">
+          <button id="execute">执行hook</button>
+          <button id="look">查看hook</button>
+          <button id="stop">关闭hook</button>
+        </td>
       </tr>
     </table>
   </main>
   <script type="text/javascript">
-    window.onload = function () {}
+    Vue.filter('time', function (value) {
+      value = value.substr(0, 19)
+      value = value.replace('T', ' ')
+      return value
+    })
+    window.onload = function () {
+      var vm = new Vue({
+        el: '#app',
+        data: {
+          list: []
+        },
+        created: function () {
+          this.$http.get('/api/list')
+          .then(function (res) {
+            this.list = res.data
+          })
+        },
+        methods: {
+
+        }
+      })
+    }
   </script>
 </body>
 </html>
