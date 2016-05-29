@@ -36,6 +36,7 @@
     }
     .tabel {
       width: 100%;
+      margin-top: 5px;
     }
     .process-list {
       height: 50px;
@@ -67,16 +68,10 @@
     #look {
       background: #42BBF2;
     }
-    #look:hover {
-      background: #64C7F5;
-    }
     #stop {
       background: #F44336;
     }
-    #stop:hover {
-      background: #FF6B60;
-    }
-    .running,.stop {
+    .running,.stopped {
       display: inline-block;
       width: 0;
       height: 0;
@@ -85,7 +80,7 @@
     .running {
       background: #4CAF50;
     }
-    .stop {
+    .stopped {
       background: #F44336;
     }
   </style>
@@ -114,11 +109,13 @@
       </tr> -->
       <tr align="center" class="process-list" v-for="ele in list">
         <td>{{ele.uid}}</td>
-        <td><span class="running"></span></td>
+        <td>
+          <span v-bind:class="{running: ele.running, stopped: !ele.running}"></span>
+        </td>
         <td>{{ele.restarts}}</td>
         <td>{{ele.ctime | time}}</td>
         <td class="buttons">
-          <button id="execute">执行hook</button>
+          <button id="execute" @click="execute(ele.uid)">执行hook</button>
           <button id="look">查看hook</button>
           <button id="stop">关闭hook</button>
         </td>
@@ -144,7 +141,9 @@
           })
         },
         methods: {
-
+          execute: function (name) {
+            console.log(name)
+          }
         }
       })
     }
